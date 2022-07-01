@@ -1,6 +1,7 @@
-var baseUrl="http://localhost:8080//SpringPOS_BackEnd_war/pos/v1/customer"
+var baseUrlCustomer="http://localhost:8080//SpringPOS_BackEnd_war/pos/v1/customer"
+var baseUrlItem="http://localhost:8080//SpringPOS_BackEnd_war/pos/v1/item"
 
-//populateItemDropDown();
+populateItemDropDown();
 populateCustomerDropDown();
 //set the today date
 document.getElementById('date').valueAsDate = new Date();
@@ -13,7 +14,7 @@ function populateCustomerDropDown() {
     customerOptions[0] = 'Choose...';
 
     $.ajax({
-        url:baseUrl+"/cusID",
+        url:baseUrlCustomer+"/cusID",
         method:"GET",
         success:function (resp){
             for (var i=0;i<resp.data.length;i++) {
@@ -27,8 +28,8 @@ function populateCustomerDropDown() {
                 select.appendChild(el);
             }
         },
-        error:function(ob,state){
-            console.log(ob,state);
+        error:function(ob){
+            console.log(ob);
         }
     });
 }
@@ -42,7 +43,7 @@ function populateItemDropDown() {
     itemOptions[0] = 'Choose...';
 
     $.ajax({
-        url:"http://localhost:8080/BackEnd_Web_exploded/item?option=GETID",
+        url:baseUrlItem+"/itemCode",
         method:"GET",
         success:function (resp){
             for (var i=0;i<resp.data.length;i++) {
@@ -56,8 +57,8 @@ function populateItemDropDown() {
                 select.appendChild(el);
             }
         },
-        error:function(ob,state){
-            console.log(ob,state);
+        error:function(ob){
+            console.log(ob);
         }
     });
 }
@@ -65,7 +66,6 @@ function populateItemDropDown() {
 //load selected customer details
 $('#cusID').on('change', function () {
     getSelectedCustomer();
-    //validateCustomerFeild();
 });
 
 function getSelectedCustomer() {
@@ -74,20 +74,18 @@ function getSelectedCustomer() {
 
 function customerSearch(id){
     $.ajax({
-        url: "http://localhost:8080/BackEnd_Web_exploded/customer?option=SEARCH&CustomerID="+id,
+        url:baseUrlCustomer+"/"+id,
         method:"GET",
         success:function (resp) {
-            if (resp.status == 200) {
-                for (var i = 0; i < resp.data.length; i++) {
-                    $('#customer').val(resp.data[i].id);
-                    $('#name').val(resp.data[i].name);
-                    $('#address').val(resp.data[i].address);
-                    $('#telNum').val(resp.data[i].teleNumber);
+            if (resp.code == 200) {
+                    $('#customer').val(resp.data.customerID);
+                    $('#name').val(resp.data.customerName);
+                    $('#address').val(resp.data.customerAddress);
+                    $('#telNum').val(resp.data.customerTeleNumber);
                 }
-            }
         },
-            error:function(ob,state){
-                console.log(ob,state);
+            error:function(ob){
+                console.log(ob);
             }
         });
 }
@@ -96,7 +94,6 @@ function customerSearch(id){
 $('#ItemCode').on('change', function () {
     getSelectedItem();
     checkSufficientQuantity();
-   // validateItemField();
 });
 
 
@@ -106,20 +103,18 @@ function getSelectedItem() {
 
 function itemSearch(id){
     $.ajax({
-        url: "http://localhost:8080/BackEnd_Web_exploded/item?option=SEARCH&ItemCode="+id,
+        url: baseUrlItem+"/"+id,
         method:"GET",
         success:function (resp) {
-            if (resp.status == 200) {
-                for (var i = 0; i < resp.data.length; i++) {
-                    $('#item').val(resp.data[i].code);
-                    $('#itemName').val(resp.data[i].itemName);
-                    $('#price').val(resp.data[i].price);
-                    $('#quantityOnHand').val(resp.data[i].quantity);
-                }
+            if (resp.code == 200) {
+                    $('#item').val(resp.data.itemCode);
+                    $('#itemName').val(resp.data.itemName);
+                    $('#price').val(resp.data.unitPrice);
+                    $('#quantityOnHand').val(resp.data.quantity);
             }
         },
-        error:function(ob,state){
-            console.log(ob,state);
+        error:function(ob){
+            console.log(ob);
         }
     });
 }

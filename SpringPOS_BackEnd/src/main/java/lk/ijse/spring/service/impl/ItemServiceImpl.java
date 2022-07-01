@@ -62,4 +62,9 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDTO> getAllItems() {
         return mapper.map(repo.findAll(),new TypeToken<List<ItemDTO>>(){}.getType());
     }
+
+    @Override
+    public List<String> getAllItemCodes() {
+        return repo.getAllItemCodes();
+    }
 }

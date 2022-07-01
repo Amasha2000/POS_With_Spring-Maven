@@ -49,4 +49,9 @@ public class ItemController {
         return new ResponseUtil(200,"OK",itemService.getAllItems());
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
+    @GetMapping(path = "/itemCode",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseUtil getAllItemCodes(){
+        return new ResponseUtil(200,"OK",itemService.getAllItemCodes());
+    }
 }
