@@ -1,3 +1,6 @@
+
+var baseUrl="http://localhost:8080//SpringPOS_BackEnd_war/pos/v1/item"
+
 loadItemDetailsToTable();
 
 //--------------------------------------------Save Item-------------------------------------------------------------
@@ -9,20 +12,16 @@ function saveItem() {
     $('#item-table tbody tr').off();
 
     if (confirm('Do you want to Save Item Details?')) {
-        // if (response != undefined) {
-        //     swal("The Item already exists", "warning");
-        //     //clear Input Fields
-        //     clearAllItemDetails();
-        // } else {
 
         var itemForm = $("#itemForm").serialize();
 
+
         $.ajax({
-            url: "http://localhost:8080/BackEnd_Web_exploded/item",
+            url: baseUrl,
             method: "POST",
             data: itemForm,
             success: function (res) {
-                if (res.status == 200) {
+                if (res.code == 200) {
 
                     alert(res.message);
 
@@ -39,17 +38,15 @@ function saveItem() {
                     removeItemTableRows();
 
                     //populate item drop down list
-                     populateItemDropDown();
+                    // populateItemDropDown();
 
                 }
             },
-            error: function (ob, textStatus, error) {
-                alert(textStatus);
+            error: function (ob) {
+                alert(ob.responseJSON.message);
 
             }
         });
-
-        // var response = searchItem(itemCode);
 
     } else {
         //clear Input Fields
@@ -65,24 +62,20 @@ $('#button-update-item').click(function () {
 function updateItem() {
     if (confirm('Do you want to Update Item Details?')) {
 
-        // var code = $("#item-code").val();
-        // var response = searchItem(code);
-        //
-        // if (response != undefined) {
             var item={
-                code:$("#item-code").val(),
+                itemCode:$("#item-code").val(),
                 itemName:$("#item-name").val(),
                 quantity:$("#item-quantity").val(),
-                price:$("#item-price").val()
+                unitPrice:$("#item-price").val()
             }
 
         $.ajax({
-            url: "http://localhost:8080/BackEnd_Web_exploded/item",
+            url: baseUrl,
             method: "PUT",
-            contentType: "application.json",
+            contentType: "application/json",
             data: JSON.stringify(item),
             success: function (res) {
-                if (res.status == 200) {
+                if (res.code == 200) {
                     alert(res.message);
                     //Load Item Details To Table
                     loadItemDetailsToTable();
@@ -96,21 +89,12 @@ function updateItem() {
                     //Remove Table Details when double click the row
                     removeItemTableRows();
 
-                } else if (res.status == 400) {
-                    alert(res.message);
-                } else {
-                    alert(res.data)
                 }
             },
-            error: function (ob, status, t) {
-                alert(ob);
+            error: function (ob) {
+                alert(ob.responseJSON.message);
             }
         });
-
-        // } else {
-        //     swal("Add Item Details To Update!!!", "warning");
-        //     clearAllItemDetails();
-
     } else {
         //Do Nothing
         clearAllItemDetails();
@@ -123,16 +107,14 @@ $('#button-delete-item').click(function () {
 });
 
 function deleteItem() {
-    //let response = searchItem($("#item-code").val());
     if (confirm('Do you want to Delete Item Details?')) {
-      //  if (response != undefined) {
            var code=$("#item-code").val();
 
         $.ajax({
-            url:"http://localhost:8080/BackEnd_Web_exploded/item?ItemCode="+code,
+            url: baseUrl+"?code="+code,
             method:"DELETE",
             success:function (res){
-                if(res.status==200){
+                if(res.code==200){
                     alert(res.message);
 
                     //Load Item Details To Table
@@ -148,23 +130,15 @@ function deleteItem() {
                     removeItemTableRows();
 
                     //populate item drop down list
-                    populateItemDropDown();
+                   // populateItemDropDown();
 
-                }else if(res.status==400){
-                    alert(res.data);
-                }else{
-                    alert(res.data);
                 }
             },
-            error:function (ob,status,t){
-                alert(ob);
+            error:function (ob){
+                alert(ob.responseJSON.message);
             }
         });
 
-        // } else {
-        //     swal("Add Item Details To Delete!!!", "warning");
-        //     clearAllItemDetails();
-        // }
     } else {
         //Do Nothing
         clearAllItemDetails();
@@ -172,30 +146,23 @@ function deleteItem() {
 }
 
 //---------------------------------------------Search item----------------------------------------------------------
-var responseSearchItem=true;
 $('#item-search-button').on('click', function () {
     var itemCode = $('#item-search').val();
     searchItem(itemCode);
-    if (responseSearchItem) {
-        alert("Done");
-    } else {
-        $('#item-search').val('');
-        swal('No such a Item', "info");
-    }
 });
 
 function searchItem(code) {
     $.ajax({
-        url: "http://localhost:8080/BackEnd_Web_exploded/item?option=SEARCH&ItemCode="+code,
+        url: baseUrl+"/"+code,
         method:"GET",
         success:function (resp){
-            if (resp.status == 200) {
-                for (var i = 0; i < resp.data.length; i++) {
-                    $('#item-code').val(resp.data[i].code);
-                    $('#item-name').val(resp.data[i].itemName);
-                    $('#item-quantity').val(resp.data[i].quantity);
-                    $('#item-price').val(resp.data[i].price);
-                }
+            if (resp.code == 200) {
+                var item=resp.data;
+                    $('#item-code').val(item.itemCode);
+                    $('#item-name').val(item.itemName);
+                    $('#item-quantity').val(item.quantity);
+                    $('#item-price').val(item.unitPrice);
+                
 
                 $('#item-search').val('');
 
@@ -205,13 +172,11 @@ function searchItem(code) {
                 //Remove Table Details when double click the row
                 removeItemTableRows();
 
-                responseSearchItem = true;
             }
 
         },
-        error:function(ob,state){
-            console.log(ob,state);
-            responseSearchItem=false;
+        error:function(ob){
+            alert(ob.responseJSON.message);
         }
     });
 }
@@ -221,18 +186,18 @@ function loadItemDetailsToTable() {
     $('#item-table tbody').empty();
 
     $.ajax({
-        url:"http://localhost:8080/BackEnd_Web_exploded/item?option=GETALL",
+        url:baseUrl,
         method:"GET",
         success:function (resp){
-            for (var i=0;i<resp.data.length;i++) {
+            for (var item of resp.data) {
                 $('#item-table tbody').append(
-                    `<tr><td>${resp.data[i].code}</td><td>${resp.data[i].itemName}</td><td>${resp.data[i].quantity}</td><td>${resp.data[i].price}</td></tr>`
+                    `<tr><td>${item.itemCode}</td><td>${item.itemName}</td><td>${item.quantity}</td><td>${item.unitPrice}</td></tr>`
                 );
             }
             loadItemDetailsToInputFields();
         },
-        error:function(ob,state){
-            console.log(ob,state);
+        error:function(ob){
+            alert(ob.reponseJSON.message);
         }
     });
 }
