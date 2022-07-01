@@ -1,5 +1,7 @@
-loadCustomerDetailsToTable();
 
+var baseUrl="http://localhost:8080//SpringPOS_BackEnd_war/pos/v1/customer"
+
+loadCustomerDetailsToTable();
 //--------------------------------------------Save Customer-------------------------------------------------------------
 $('#button-save-customer').click(function () {
     saveCustomer();
@@ -9,23 +11,14 @@ function saveCustomer() {
     $('#customer-table tbody tr').off();
 
     if (confirm('Do you want to Save Customer Details?')) {
-        //  searchCustomer($("#cus-id"));
-        //
-        // if (responseSearchCustomer) {
-        //     alert("The Customer already exists", "warning");
-        //     //clear Input Fields
-        //     clearAll();
-        //
-        //  } else {
-
             var customerForm = $("#customerForm").serialize();
 
             $.ajax({
-                url: "http://localhost:8080/BackEnd_Web_exploded/customer",
+                url: baseUrl,
                 method: "POST",
                 data: customerForm,
                 success: function (res) {
-                    if (res.status == 200) {
+                    if (res.code == 200) {
 
                         alert(res.message);
 
@@ -42,17 +35,15 @@ function saveCustomer() {
                         removeTableRows();
 
                         //populate customer drop down list
-                        populateCustomerDropDown();
+                        //populateCustomerDropDown();
                     }
                 },
-                error: function (ob, textStatus, error) {
-                    alert(textStatus);
+                error: function (ob) {
+                    alert(ob.responseJSON.message);
                 }
             });
 
-        //}
     } else {
-        //clear Input Fields
         clearAll();
     }
 }
@@ -65,23 +56,22 @@ $('#button-update-customer').click(function () {
 function updateCustomer() {
     if (confirm('Do you want to Update Customer Details?')) {
 
-       // var id = $("#cus-id").val();
-       // var response = searchCustomer(id);
-
-        // if (response != undefined) {
         var customer={
-            id:$("#cus-id").val(),
-            name:$("#cus-name").val(),
-            address:$("#cus-address").val(),
-            teleNumber:$("#tel-num").val()
+            customerID:$("#cus-id").val(),
+            customerName:$("#cus-name").val(),
+            customerAddress:$("#cus-address").val(),
+            customerTeleNumber:$("#tel-num").val()
         }
+
+        console.log(JSON.stringify(customer));
+
             $.ajax({
-               url:"http://localhost:8080/BackEnd_Web_exploded/customer",
+               url:baseUrl,
                method:"PUT",
-               contentType:"application.json",
+               contentType:"application/json",
                data:JSON.stringify(customer),
                success:function (res) {
-                   if(res.status==200){
+                   if(res.code==200) {
                        alert(res.message);
                        //Load Customer Details To Table
                        loadCustomerDetailsToTable();
@@ -94,22 +84,12 @@ function updateCustomer() {
 
                        //Remove Table Details when double click the row
                        removeTableRows();
-                   }else if(res.status==400){
-                       alert(res.message);
-                   }else{
-                       alert(res.data)
                    }
                },
-               error:function (ob,status,t){
-                   alert(ob);
+               error:function (ob){
+                   alert(ob.responseJSON.message);
                }
-
             });
-
-        // } else {
-        //     swal("Add Customer Details To Update!!!", "warning");
-        //     clearAll();
-        // }
     } else {
         //Do Nothing
         clearAll();
@@ -122,15 +102,13 @@ $('#button-delete-customer').click(function () {
 });
 
 function deleteCustomer() {
-    // let response = searchCustomer($("#cus-id").val());
     if (confirm('Do you want to Delete Customer Details?')) {
-        // if (response != undefined) {
            var cusId=$("#cus-id").val();
            $.ajax({
-               url:"http://localhost:8080/BackEnd_Web_exploded/customer?CustomerID="+cusId,
+               url:baseUrl+"?id="+cusId,
                method:"DELETE",
                success:function (res){
-                   if(res.status==200){
+                   if(res.code==200){
                        alert(res.message);
                        //Load Customer Details To Table
                        loadCustomerDetailsToTable();
@@ -145,22 +123,14 @@ function deleteCustomer() {
                        removeTableRows();
 
                       // populate customer drop down list
-                       populateCustomerDropDown();
-                   }else if(res.status==400){
-                       alert(res.data);
-                   }else{
-                       alert(res.data);
+                      // populateCustomerDropDown();
                    }
                },
-               error:function (ob,status,t){
-                   alert(ob);
+               error:function (ob){
+                   alert(ob.responseJSON.message);
                }
            });
 
-        // } else {
-        //     swal("Add Customer Details To Delete!!!", "warning");
-        //     clearAll();
-        // }
     } else {
         //Do Nothing
         clearAll();
@@ -168,32 +138,23 @@ function deleteCustomer() {
 }
 
 //---------------------------------------------Search customer----------------------------------------------------------
-var responseSearchCustomer=true;
+
 $('#customer-search-button').on('click', function () {
     var cusId = $('#cus-search').val();
     searchCustomer(cusId);
-    console.log(responseSearchCustomer);
-
-    if (responseSearchCustomer) {
-        alert("Done");
-    }else{
-        $('#cus-search').val('');
-        alert('No such a Customer', "info");
-    }
 });
 
 function searchCustomer(id) {
     $.ajax({
-        url: "http://localhost:8080/BackEnd_Web_exploded/customer?option=SEARCH&CustomerID="+id,
+        url: baseUrl+"/"+id,
         method:"GET",
         success:function (resp){
-            if (resp.status == 200) {
-                for (var i = 0; i < resp.data.length; i++) {
-                    $('#cus-id').val(resp.data[i].id);
-                    $('#cus-name').val(resp.data[i].name);
-                    $('#cus-address').val(resp.data[i].address);
-                    $('#tel-num').val(resp.data[i].teleNumber);
-                }
+            if (resp.code == 200) {
+                var customer=resp.data;
+                    $('#cus-id').val(customer.customerID);
+                    $('#cus-name').val(customer.customerName);
+                    $('#cus-address').val(customer.customerAddress);
+                    $('#tel-num').val(customer.customerTeleNumber);
 
                 $('#cus-search').val('');
 
@@ -203,13 +164,11 @@ function searchCustomer(id) {
                 //Remove Table Details when double click the row
                 removeTableRows();
 
-                responseSearchCustomer = true;
             }
 
         },
-        error:function(ob,state){
-            console.log(ob,state);
-            responseSearchCustomer=false;
+        error:function(ob){
+            alert(ob.responseJSON.message);
         }
     });
 }
@@ -218,18 +177,18 @@ function searchCustomer(id) {
 function loadCustomerDetailsToTable() {
     $('#customer-table tbody').empty();
     $.ajax({
-        url:"http://localhost:8080/BackEnd_Web_exploded/customer?option=GETALL",
+        url:baseUrl,
         method:"GET",
         success:function (resp){
-            for (var i=0;i<resp.data.length;i++) {
+            for (const customer of resp.data) {
                 $('#customer-table tbody').append(
-                    `<tr><td>${resp.data[i].id}</td><td>${resp.data[i].name}</td><td>${resp.data[i].address}</td><td>${resp.data[i].teleNumber}</td></tr>`
+                    `<tr><td>${customer.customerID}</td><td>${customer.customerName}</td><td>${customer.customerAddress}</td><td>${customer.customerTeleNumber}</td></tr>`
                 );
             }
             loadCustomerDetailsToInputFields();
         },
-        error:function(ob,state){
-            console.log(ob,state);
+        error:function(ob){
+            console.log(ob.reponseJSON.message);
         }
     });
 }

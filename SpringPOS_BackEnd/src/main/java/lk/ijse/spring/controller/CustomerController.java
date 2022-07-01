@@ -26,6 +26,7 @@ public class CustomerController {
     @ResponseStatus(HttpStatus.CREATED)
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseUtil updateCustomer(@RequestBody CustomerDTO customer){
+        System.out.println(customer);
         customerService.updateCustomer(customer);
         return new ResponseUtil(200,"Updated",null);
     }
