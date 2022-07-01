@@ -35,7 +35,7 @@ function saveCustomer() {
                         removeTableRows();
 
                         //populate customer drop down list
-                        //populateCustomerDropDown();
+                        populateCustomerDropDown();
                     }
                 },
                 error: function (ob) {
@@ -123,7 +123,7 @@ function deleteCustomer() {
                        removeTableRows();
 
                       // populate customer drop down list
-                      // populateCustomerDropDown();
+                       populateCustomerDropDown();
                    }
                },
                error:function (ob){

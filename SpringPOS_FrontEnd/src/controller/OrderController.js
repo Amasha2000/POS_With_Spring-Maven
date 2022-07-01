@@ -1,4 +1,6 @@
-populateItemDropDown();
+var baseUrl="http://localhost:8080//SpringPOS_BackEnd_war/pos/v1/customer"
+
+//populateItemDropDown();
 populateCustomerDropDown();
 //set the today date
 document.getElementById('date').valueAsDate = new Date();
@@ -11,7 +13,7 @@ function populateCustomerDropDown() {
     customerOptions[0] = 'Choose...';
 
     $.ajax({
-        url:"http://localhost:8080/BackEnd_Web_exploded/customer?option=GETID",
+        url:baseUrl+"/cusID",
         method:"GET",
         success:function (resp){
             for (var i=0;i<resp.data.length;i++) {

@@ -49,4 +49,10 @@ public class CustomerController {
     public ResponseUtil getAllCustomers(){
         return new ResponseUtil(200,"OK",customerService.getAllCustomers());
     }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @GetMapping(path="/cusID",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseUtil getAllCustomerID(){
+        return new ResponseUtil(200,"OK",customerService.getAllCustomerID());
+    }
 }
