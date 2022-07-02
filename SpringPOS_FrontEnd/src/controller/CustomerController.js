@@ -188,7 +188,7 @@ function loadCustomerDetailsToTable() {
             loadCustomerDetailsToInputFields();
         },
         error:function(ob){
-            console.log(ob.reponseJSON.message);
+            console.log(ob.responseJSON.message);
         }
     });
 }

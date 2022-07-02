@@ -5,24 +5,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @ToString
 @Entity
+@IdClass(OrderDetailPK.class)
 public class OrderDetail {
     @Id
     private String itemCode;
     @Id
     private String orderId;
-    private String name;
     private int qty;
     private double unitPrice;
+    private double cost;
 
     @ManyToOne
     @JoinColumn(name="orderID",referencedColumnName = "orderId",insertable = false,updatable = false)

@@ -23,8 +23,8 @@ public class Orders {
     private double cost;
     private double discount;
     @ManyToOne(cascade={CascadeType.REFRESH,CascadeType.DETACH})
-    @JoinColumn(name="customerId",referencedColumnName = "customerID",nullable = false)
-    private Customer cusId;
+    @JoinColumn(name="cusId",referencedColumnName = "customerID")
+    private Customer customer;
 
     @OneToMany(mappedBy = "orders",cascade = CascadeType.ALL)
     private List<OrderDetail> detailList;

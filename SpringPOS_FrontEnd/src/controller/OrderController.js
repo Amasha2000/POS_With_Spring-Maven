@@ -1,5 +1,6 @@
 var baseUrlCustomer="http://localhost:8080//SpringPOS_BackEnd_war/pos/v1/customer"
 var baseUrlItem="http://localhost:8080//SpringPOS_BackEnd_war/pos/v1/item"
+var baseUrlOrder="http://localhost:8080//SpringPOS_BackEnd_war/pos/v1/placeOrder"
 
 populateItemDropDown();
 populateCustomerDropDown();
@@ -121,20 +122,18 @@ function itemSearch(id){
 
 //set order ID automatically
 
-$("#orderID").val("O00-001");
-
-function createAutoID() {
-    // $.ajax({
-    //     url:"http://localhost:8080/BackEnd_Web_exploded/order?option=GETID",
-    //     method:"GET",
-    //     success:function (resp){
-    //         $("#orderID").val(resp.data);
-    //     },
-    //     error:function(ob,state){
-    //         console.log(ob,state);
-    //     }
-    // });
-}
+$.ajax({
+    url: baseUrlOrder,
+    method: "GET",
+    success: function (res) {
+        if (res.code == 200) {
+            $("#orderID").val(res.data);
+        }
+    },
+    error: function (ob) {
+        alert(ob.responseJSON.message);
+    }
+});
 
 //check if the quantity is sufficient
 function checkSufficientQuantity() {
@@ -152,27 +151,37 @@ function checkSufficientQuantity() {
 }
 
 var cartArray =new Array();
+var detailArray =new Array();
 
 //add items to cart
 $("#btnAddItem").on("click", function () {
+     var oId=$("#orderID").val();
      var code = $("#item").val();
      var name = $("#itemName").val();
      var unitPrice = $("#price").val();
      var qty = $("#quantity").val();
      var totalPrice = (qty * unitPrice).toFixed(2);
-     // var qtyOnHand=$("#quantityOnHand").val();
 
      var item={
-        "code":code,
-        "name":name,
-        "unitPrice":unitPrice,
-        "qty" :qty,
-        "tot":totalPrice
+        code:code,
+        name:name,
+        unitPrice:unitPrice,
+        qty :qty,
+        tot:totalPrice
      }
 
 
+   var detail={
+       orderId:oId,
+       itemCode:code,
+       qty:qty,
+       unitPrice:unitPrice,
+       cost:totalPrice
+   }
+
     if(cartArray.length!=0) {
          var resp= searchCart(code);
+         var res= searchDetail(code);
          if(resp) {
                     let totalQty = +(resp.qty) + +qty;
                     let total = (totalQty * unitPrice).toFixed(2);
@@ -183,6 +192,13 @@ $("#btnAddItem").on("click", function () {
                     resp.qty = totalQty;
                     resp.tot = total;
 
+
+                    res.itemCode = code;
+                    res.orderId = oId;
+                    res.unitPrice = unitPrice;
+                    res.qty = totalQty;
+                    res.cost = total;
+
                     loadCartDetailsToTable();
 
                     $("#quantity").val("");
@@ -191,6 +207,7 @@ $("#btnAddItem").on("click", function () {
                     setTotal();
                 }else {
             cartArray.push(item);
+            detailArray.push(detail);
             loadCartDetailsToTable();
 
             $("#quantity").val("");
@@ -202,6 +219,7 @@ $("#btnAddItem").on("click", function () {
         }
         }else{
          cartArray.push(item);
+         detailArray.push(detail);
          loadCartDetailsToTable();
 
          $("#quantity").val("");
@@ -229,6 +247,14 @@ function searchCart(id) {
     for (var i = 0; i < cartArray.length; i++) {
         if (cartArray[i].code == id) {
             return cartArray[i];
+        }
+    }
+}
+
+function searchDetail(id) {
+    for (var i = 0; i < detailArray.length; i++) {
+        if (detailArray[i].itemCode == id) {
+            return detailArray[i];
         }
     }
 }
@@ -302,35 +328,48 @@ $("#btn-purchase").on("click", function () {
 
         var oId=$("#orderID").val();
         var cusId = $("#customer").val();
+        var cusName=$("#name").val();
+        var cusAddress=$("#address").val();
+        var TeleNumber=$("#telNum").val();
         var date = $("#date").val();
         var discount = $("#discount").val();
         var total = $("#total").text();
 
+        var customer={
+            customerID:cusId,
+            customerName:cusName,
+            customerAddress:cusAddress,
+            customerTeleNumber:TeleNumber
+        }
+
         var order={
-            "oId":oId,
-            "cusId":cusId,
-            "date":date,
-            "discount":discount,
-            "total":total,
-            "cart":cartArray
+            orderId:oId,
+            customerDTO:customer,
+            orderDate:date,
+            cost:total,
+            discount:discount,
+            detailList:detailArray
         }
 
         $.ajax({
-            url: "http://localhost:8080/BackEnd_Web_exploded/order",
+            url: baseUrlOrder,
             method: "POST",
             contentType:"application/json",
             data: JSON.stringify(order),
             success: function (res) {
-                if (res.status == 200) {
+                if (res.code == 200) {
 
-                    //alert(res.message);
-                    alert("Order Placed Successfully", "success");
+                    alert(res.message);
+
                     clearOrderDetail();
-                    //createAutoID();
+
+                    $("#orderID").val(res.data);
+
+                    loadItemDetailsToTable();
                 }
             },
-            error: function (ob, textStatus, error) {
-                alert(textStatus);
+            error: function (ob) {
+                alert(ob.responseJSON.message);
             }
         });
     }
@@ -348,32 +387,6 @@ function clearOrderDetail() {
     loadCartDetailsToTable();
     $('#customer-error,#customer-name-error,#customer-address-error,#number-error,#item-error,#itemName-error,#qty-error,#price-error').text('');
 }
-
-//search order
-// $('#order-search').keydown(function (event) {
-//     if (event.key == 'Control') {
-//         var oId = $('#order-search').val();
-//         var responseId = searchOrder(oId);
-//         if (responseId) {
-//             var responseCustomer = searchCustomer(responseId.getCusId());
-//             $('#customer').val(responseId.getCusId());
-//             $('#name').val(responseCustomer.getCustomerName());
-//             $('#address').val(responseCustomer.getCustomerAddress());
-//             $('#telNum').val(responseCustomer.getCustomerTeleNumber());
-//             $('#total').text(responseId.getCost());
-//         } else {
-//             swal("No such an order", "info");
-//         }
-//     }
-// });
-
-// function searchOrder(id) {
-//     for (let i = 0; i < orderArray.length; i++) {
-//         if (orderArray[i].getOrderID() == id) {
-//             return orderArray[i];
-//         }
-//     }
-// }
 
 
 //validate customer details

@@ -197,7 +197,7 @@ function loadItemDetailsToTable() {
             loadItemDetailsToInputFields();
         },
         error:function(ob){
-            alert(ob.reponseJSON.message);
+            alert(ob.responseJSON.message);
         }
     });
 }
