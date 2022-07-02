@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/SpringPOS.iml" filepath="$PROJECT_DIR$/SpringPOS.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SpringPOS_BackEnd/SpringPOS_BackEnd.iml" filepath="$PROJECT_DIR$/SpringPOS_BackEnd/SpringPOS_BackEnd.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SpringPOS_FrontEnd/SpringPOS_FrontEnd.iml" filepath="$PROJECT_DIR$/SpringPOS_FrontEnd/SpringPOS_FrontEnd.iml" />
+    </modules>
+  </component>
+</project>
