@@ -139,7 +139,7 @@ function createAutoID() {
 //check if the quantity is sufficient
 function checkSufficientQuantity() {
     $("#quantity").on('keyup', function () {
-        if ($("#quantityOnHand").val() >= $("#quantity").val() && regExItemQuantity.test($("#quantity").val())) {
+        if (+$("#quantityOnHand").val() >= +$("#quantity").val() && regExItemQuantity.test($("#quantity").val())) {
             $('#quantity').css('border', '3px solid green');
             $("#orderQuantity-error").text('');
             $("#btnAddItem").attr('disabled', false);
@@ -160,7 +160,7 @@ $("#btnAddItem").on("click", function () {
      var unitPrice = $("#price").val();
      var qty = $("#quantity").val();
      var totalPrice = (qty * unitPrice).toFixed(2);
-     var qtyOnHand=$("#quantityOnHand").val();
+     // var qtyOnHand=$("#quantityOnHand").val();
 
      var item={
         "code":code,
@@ -170,42 +170,10 @@ $("#btnAddItem").on("click", function () {
         "tot":totalPrice
      }
 
-    // var updatedItem={
-    //     itemCode:code,
-    //     itemName:name,
-    //     qty:+qtyOnHand - +qty,
-    //     price:unitPrice
-    // }
-    //
-    // $.ajax({
-    //     url: "http://localhost:8080/BackEnd_Web_exploded/item",
-    //     method:"PUT",
-    //     contentType: "application.json",
-    //     data: JSON.stringify(updatedItem),
-    //     success:function (res) {
-    //         if (res.status == 200) {
-    //
-    //             //Load Item Details To Table
-    //             loadItemDetailsToTable();
-    //
-    //             getSelectedItem();
-    //
-    //         } else if (res.status == 400) {
-    //             alert(res.message);
-    //         } else {
-    //             alert(res.data)
-    //         }
-    //     },
-    //     error: function (ob, status, t) {
-    //         alert(ob);
-    //     }
-    // });
-
-
 
     if(cartArray.length!=0) {
          var resp= searchCart(code);
-        if(resp) {
+         if(resp) {
                     let totalQty = +(resp.qty) + +qty;
                     let total = (totalQty * unitPrice).toFixed(2);
 
@@ -217,37 +185,30 @@ $("#btnAddItem").on("click", function () {
 
                     loadCartDetailsToTable();
 
-                    // searchItemResponse.setQuantity(+searchItemResponse.getQuantity() - +qty);
-                    // getSelectedItem();
-
                     $("#quantity").val("");
-                    // removeItems();
+                    removeItems();
 
                     setTotal();
                 }else {
             cartArray.push(item);
             loadCartDetailsToTable();
-            // searchItemResponse.setQuantity(+searchItemResponse.getQuantity() - +qty);
-            // getSelectedItem();
 
             $("#quantity").val("");
 
             setTotal();
-            
 
-            // let searchItemResponse = searchItem(code);
+            removeItems();
+
         }
         }else{
          cartArray.push(item);
          loadCartDetailsToTable();
-         // searchItemResponse.setQuantity(+searchItemResponse.getQuantity() - +qty);
-         // getSelectedItem();
 
          $("#quantity").val("");
 
          setTotal();
 
-         // let searchItemResponse = searchItem(code);
+        removeItems();
      }
 
 });
@@ -266,7 +227,6 @@ function loadCartDetailsToTable() {
 //search cart
 function searchCart(id) {
     for (var i = 0; i < cartArray.length; i++) {
-
         if (cartArray[i].code == id) {
             return cartArray[i];
         }
@@ -286,11 +246,14 @@ function setTotal() {
 //remove items from the cart
 function removeItems() {
     $('#cart tbody tr').dblclick(function () {
-        let response = searchCart($(this).children(":nth-child(1)").text());
-        let index = cartArray.indexOf(response);
-        cartArray.splice(index, 1);
-        loadCartDetailsToTable();
-        setTotal();
+        let code=($(this).children(":nth-child(1)").text());
+        for (var i = 0; i < cartArray.length; i++) {
+            if (cartArray[i].code == code) {
+                cartArray.splice(i, 1);
+                loadCartDetailsToTable();
+                setTotal();
+            }
+        }
     });
 }
 
