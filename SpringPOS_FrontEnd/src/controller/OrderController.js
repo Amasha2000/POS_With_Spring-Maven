@@ -1,6 +1,6 @@
-var baseUrlCustomer="http://localhost:8080//SpringPOS_BackEnd_war/pos/v1/customer"
-var baseUrlItem="http://localhost:8080//SpringPOS_BackEnd_war/pos/v1/item"
-var baseUrlOrder="http://localhost:8080//SpringPOS_BackEnd_war/pos/v1/placeOrder"
+var baseUrlCustomer="http://localhost:8080/SpringPOS_BackEnd-1.0.0/pos/v1/customer"
+var baseUrlItem="http://localhost:8080/SpringPOS_BackEnd-1.0.0/pos/v1/item"
+var baseUrlOrder="http://localhost:8080/SpringPOS_BackEnd-1.0.0/pos/v1/placeOrder"
 
 populateItemDropDown();
 populateCustomerDropDown();

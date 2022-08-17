@@ -1,5 +1,5 @@
 
-var baseUrl="http://localhost:8080//SpringPOS_BackEnd_war/pos/v1/item"
+var baseUrl="http://localhost:8080/SpringPOS_BackEnd-1.0.0/pos/v1/item"
 
 loadItemDetailsToTable();
 

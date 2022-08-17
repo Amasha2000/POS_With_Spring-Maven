@@ -1,5 +1,5 @@
 
-var baseUrl="http://localhost:8080//SpringPOS_BackEnd_war/pos/v1/customer"
+var baseUrl="http://localhost:8080/SpringPOS_BackEnd-1.0.0/pos/v1/customer"
 
 loadCustomerDetailsToTable();
 //--------------------------------------------Save Customer-------------------------------------------------------------
